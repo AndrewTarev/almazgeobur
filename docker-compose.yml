@@ -1,0 +1,94 @@
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: ${POSTGRES_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_NAME}" ]
+      interval: 1s
+      timeout: 5s
+      retries: 3
+    restart: always
+    volumes:
+      - ./postgres_data/:/var/lib/postgresql/data
+    networks:
+      - my_network
+
+  celery:
+    build: ./
+    container_name: celery
+    command: celery -A src.celery.celery_worker worker --loglevel=info --logfile=/logs/celery.log
+    volumes:
+      - ./celery_data:/logs/
+      - ./reports:/app/reports
+    environment:
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
+    depends_on:
+      - backend
+      - redis
+    networks:
+      - my_network
+
+  redis:
+    image: redis:7.4.1
+    container_name: redis_container
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis_data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "-a", "redis", "ping" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+    tty: true
+    stdin_open: true
+    networks:
+      - my_network
+
+  flower:
+    build: ./
+    container_name: flower
+    command: celery -A src.celery.celery_worker flower --port=5555
+    ports:
+      - 5555:5555
+    environment:
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
+    depends_on:
+      - celery
+    networks:
+      - my_network
+
+
+  backend:
+    build:
+      dockerfile: Dockerfile
+    stop_signal: SIGKILL
+    env_file:
+      - .env
+    container_name: xml_parser
+    volumes:
+      - ./src/reports:/reports
+      - ./celery_data:/celery_data
+    ports:
+      - "8000:8000"
+    command: ["/app/docker-entrypoint.sh"]
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - my_network
+
+
+networks:
+  my_network:
+    driver: bridge
