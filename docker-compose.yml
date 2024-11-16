@@ -21,10 +21,9 @@ services:
   celery:
     build: ./
     container_name: celery
-    command: celery -A src.celery.celery_worker worker --loglevel=info --logfile=/logs/celery.log
+    command: celery -A src.celery.celery_worker worker --concurrency=4 --loglevel=info --logfile=/logs/celery.log
     volumes:
       - ./celery_data:/logs/
-      - ./reports:/app/reports
     environment:
       - CELERY_BROKER_URL=${CELERY_BROKER_URL}
       - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
@@ -74,9 +73,6 @@ services:
     env_file:
       - .env
     container_name: xml_parser
-    volumes:
-      - ./src/reports:/reports
-      - ./celery_data:/celery_data
     ports:
       - "8000:8000"
     command: ["/app/docker-entrypoint.sh"]

@@ -1,55 +1,39 @@
-from datetime import datetime
-from typing import List, Tuple
-
+from typing import Any
 from fastapi import HTTPException
-
-from src.core.models.shop_model import Product
 from src.core.utils.logging_config import my_logger
 
 
-def analyze_data(sales_data: List[Product]) -> tuple[int, str, str, datetime]:
+def analyze_data(sales_data: list[dict[str, Any]]) -> tuple:
     """
-    Analyzes sales data to compute total revenue, top products sold, and distribution by categories.
-    It needs for prompt query.
+    Analyzes sales data and returns a summary including total revenue,
+    top products, and categories.
 
-    This function iterates over a list of `Product` objects to calculate the total revenue,
-    determine the top three products based on sales quantity, and produce a summary of sales
-    distribution across different categories.
-
-    :param sales_data: A list of Product objects, where each Product includes the `name`, `quantity`,
-                       `price`, and `category` attributes.
-    :type sales_data: List[Product]
-
-    :return: A tuple containing:
-        - Total revenue (int): The sum of the product of quantity and price for all products.
-        - Top products (str): A formatted string of the top 3 products by sales quantity,
-          each with its name and quantity sold.
-        - Categories distribution (str): A formatted string showing the quantity sold for each category.
-    :rtype: Tuple[int, str, str]
-
-    :raises ValueError: If the sales_data list is empty.
+    :param sales_data: A list of dictionaries, each representing a sale.
+    :return: A tuple containing the date, total revenue, top products, and categories.
     """
+    my_logger.debug("Task analyzing data started")
+
     if not sales_data:
         my_logger.info("Data is empty.")
         raise HTTPException(status_code=404, detail="Data is empty.")
 
-    date: datetime = sales_data[0].date
+    date = sales_data[0]["date"]
     total_revenue = 0
     product_sales = {}
     category_distribution = {}
 
-    for value in sales_data:
-        total_revenue += value.quantity * value.price
+    for sale in sales_data:
+        total_revenue += sale["quantity"] * sale["price"]
 
-        if value.name in product_sales:
-            product_sales[value.name] += value.quantity
+        if sale["name"] in product_sales:
+            product_sales[sale["name"]] += sale["quantity"]
         else:
-            product_sales[value.name] = value.quantity
+            product_sales[sale["name"]] = sale["quantity"]
 
-        if value.category in category_distribution:
-            category_distribution[value.category] += value.quantity
+        if sale["category"] in category_distribution:
+            category_distribution[sale["category"]] += sale["quantity"]
         else:
-            category_distribution[value.category] = value.quantity
+            category_distribution[sale["category"]] = sale["quantity"]
 
     # Определение топ-3 продуктов по продажам
     top_products = sorted(product_sales.items(), key=lambda x: x[1], reverse=True)[:3]
@@ -61,5 +45,6 @@ def analyze_data(sales_data: List[Product]) -> tuple[int, str, str, datetime]:
     categories_str = ", ".join(
         [f"{cat}: {qty}" for cat, qty in category_distribution.items()]
     )
+
     my_logger.info("Analyzing sales data successfully.")
-    return total_revenue, top_products_str, categories_str, date
+    return date, total_revenue, top_products_str, categories_str

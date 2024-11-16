@@ -12,10 +12,10 @@ def configure_logging() -> logger:  #
     logger.add(
         sys.stdout,
         level=settings.logging,
-        format="<yellow>{name}</yellow> | "
-        "<yellow>{time:YYYY-MM-DD HH:mm:ss}</yellow> | "
+        format="<yellow>{time:YYYY-MM-DD HH:mm:ss}</yellow> | "
         "<level>{level}</level> | "
-        "<yellow>{message}</yellow>",
+        "<yellow>{message}</yellow> |"
+        "<yellow>{name}</yellow>",
     )
 
     return logger

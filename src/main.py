@@ -18,14 +18,6 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
 
 app = FastAPI()
 
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=["*"],
-#     allow_credentials=True,
-#     allow_headers=["*"],
-#     allow_methods=["*"],
-# )
-
 
 @app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(
