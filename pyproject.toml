@@ -1,0 +1,35 @@
+[tool.poetry]
+name = "almazgeobur-test-task"
+version = "0.1.0"
+description = ""
+authors = ["AndrewTarev <153756623+AndrewTarev@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.111.1"
+asyncpg = "^0.29.0"
+alembic = "^1.13.2"
+pydantic-settings = "^2.6.1"
+gunicorn = "^22.0.0"
+greenlet = "^3.0.3"
+loguru = "^0.7.2"
+defusedxml = "^0.7.1"
+celery = {extras = ["redis"], version = "^5.4.0"}
+openai = "^1.54.4"
+python-docx = "^1.1.2"
+flower = "^2.0.1"
+
+
+[tool.poetry.group.dev.dependencies]
+flake8 = "^7.1.1"
+isort = "^5.13.2"
+pytest = "^8.3.2"
+pytest-asyncio = "^0.24.0"
+black = "^24.8.0"
+mypy = "^1.11.2"
+pytest-mock = "^3.14.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
