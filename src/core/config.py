@@ -48,8 +48,8 @@ class DatabaseConfig(BaseSettings):
 
 class Settings(BaseModel):
     model_config = SettingsConfigDict(case_sensitive=True)
-    db: DatabaseConfig = DatabaseConfig()  # type: ignore
-    celery: CeleryConfig = CeleryConfig()  # type: ignore
+    db: DatabaseConfig = DatabaseConfig()
+    celery: CeleryConfig = CeleryConfig()
     openapi: OpenAPISettings = OpenAPISettings()
     cache_url: RedisCache = RedisCache()
     logging: str = "DEBUG"
