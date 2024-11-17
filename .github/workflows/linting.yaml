@@ -1,0 +1,51 @@
+name: Linting
+
+on:
+  push:
+    branches:
+      - main      # Укажите ветку, для которой будет выполняться линтинг
+  pull_request:
+    branches:
+      - main      # Укажите ветку, для которой будет выполняться линтинг при создании Pull Request
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Проверка из репозитория
+        uses: actions/checkout@v2
+
+      - name: Установка Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.12'
+
+      - name: Установка Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "${HOME}/.local/bin" >> $GITHUB_PATH
+
+      - name: Установка зависимостей
+        run: |
+          poetry install --no-interaction --no-root
+
+      - name: Линтинг кода с flake8
+        run: |
+          poetry run flake8 .
+
+      - name: Сортировка импортов с isort
+        run: |
+          poetry run isort --check-only .
+
+      - name: Статический анализ типов с mypy
+        run: |
+          poetry run mypy .
+
+      - name: Форматирование кода с black
+        run: |
+          poetry run black --check .
+
+      - name: Запуск тестов с pytest
+        run: |
+          poetry run pytest
