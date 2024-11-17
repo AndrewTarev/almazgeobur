@@ -4,7 +4,9 @@ from src.core.config import settings
 from src.core.utils.logging_config import my_logger
 
 
-def generate_report_content(date, total_revenue, top_products, categories) -> str:
+def generate_report_content(
+    date: str, total_revenue: float, top_products: str, categories: str
+) -> str | None:
     """
     Генерирует аналитический отчет на основе предоставленных данных о продажах.
 
@@ -38,6 +40,5 @@ def generate_report_content(date, total_revenue, top_products, categories) -> st
     except Exception as e:
         my_logger.error(f"Error in OpenAI completion: {str(e)}")
         raise Exception(e)
-    # report_content = "ai report"
     my_logger.info("Prompt query completed successfully.")
     return report_content

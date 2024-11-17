@@ -1,11 +1,11 @@
+from typing import Any, Dict, List
+
 import defusedxml.ElementTree as ET
 
 from src.core.utils.logging_config import my_logger
 
-from typing import List, Dict, Any
 
-
-def parse_xml(xml_content) -> List[Dict[str, Any]]:
+def parse_xml(xml_content: bytes) -> List[Dict[str, Any]]:
     """
     Парсит XML контент.
     :param xml_content: xml content to be parsed.

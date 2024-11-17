@@ -1,8 +1,9 @@
-from typing import Any
+from typing import Any, Dict, List, Tuple
+
 from src.core.utils.logging_config import my_logger
 
 
-def analyze_data(sales_data: list[dict[str, Any]]) -> tuple:
+def analyze_data(sales_data: List[Dict[str, Any]]) -> Tuple[str, int, str, str]:
     """
     Анализирует данные о продажах и возвращает сводку, включающую общую выручку,
     топовые продукты и категории.
@@ -11,10 +12,10 @@ def analyze_data(sales_data: list[dict[str, Any]]) -> tuple:
                        Каждый словарь должен содержать ключи:
                        "name", "quantity", "price", "category", и "date".
     :return: Кортеж, содержащий:
-         - дату первой записи из данных
-         - общую выручку
-         - строку с топ-3 продуктами и их количеством
-         - строку с распределением по категориям и количеством продаж.
+         - дату первой записи из данных (str)
+         - общую выручку (int)
+         - строку с топ-3 продуктами и их количеством (str)
+         - строку с распределением по категориям и количеству продаж (str).
     """
     my_logger.debug("Task analyzing data started")
 
@@ -22,10 +23,10 @@ def analyze_data(sales_data: list[dict[str, Any]]) -> tuple:
         my_logger.info("Data is empty.")
         raise ValueError("Data is empty.")
 
-    date = sales_data[0]["date"]
-    total_revenue = 0
-    product_sales = {}
-    category_distribution = {}
+    date: str = sales_data[0]["date"]
+    total_revenue: int = 0
+    product_sales: Dict[str, int] = {}
+    category_distribution: Dict[str, int] = {}
 
     for sale in sales_data:
         total_revenue += sale["quantity"] * sale["price"]

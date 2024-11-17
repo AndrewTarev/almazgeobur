@@ -2,7 +2,7 @@ import asyncio
 from datetime import datetime
 from typing import List
 
-from sqlalchemy import func, ForeignKey
+from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.core.base import Base
@@ -22,7 +22,7 @@ class Product(Base):
 
     llm_report: Mapped["LLMreport"] = relationship(back_populates="product")
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<Product(product_name={self.name}, quantity={self.quantity}, price={self.price})>"
 
 
@@ -33,11 +33,11 @@ class LLMreport(Base):
 
     product: Mapped[List["Product"]] = relationship(back_populates="llm_report")
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<LLMreport(ai_report={self.ai_report}>"
 
 
-async def create_tables():
+async def create_tables() -> None:
     async with db_helper.engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)

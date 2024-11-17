@@ -3,21 +3,21 @@ from typing import AsyncIterator
 
 import redis
 import uvicorn
+from fastapi import FastAPI, Request
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
+from starlette.exceptions import HTTPException as StarletteHTTPException
+from starlette.responses import JSONResponse
 
 from src.api.v1 import router
 from src.core.config import settings
 from src.core.db_helper import db_helper
-from fastapi import FastAPI, Request
-from starlette.exceptions import HTTPException as StarletteHTTPException
-from starlette.responses import JSONResponse
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     redis_cache = redis.from_url(settings.cache_url.redis_cache)
-    FastAPICache.init(RedisBackend(redis_cache), prefix="fastapi-cache")
+    FastAPICache.init(RedisBackend(redis_cache), prefix="fastapi-cache")  # type: ignore
     yield
     await db_helper.dispose()
 

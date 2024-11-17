@@ -1,11 +1,11 @@
-import pytest
 import defusedxml.ElementTree as ET
+import pytest
 
 from src.core.utils.xml_parser import parse_xml
 
 
-def test_parse_xml_successful():
-    xml_content = """
+def test_parse_xml_successful() -> None:
+    xml_content = b"""
     <sales_data date="2024-01-01">
         <products>
             <product>
@@ -47,8 +47,8 @@ def test_parse_xml_successful():
     assert result == expected_sales_data
 
 
-def test_parse_xml_no_products():
-    xml_content = """
+def test_parse_xml_no_products() -> None:
+    xml_content = b"""
     <sales_data date="2024-01-01">
     </sales_data>
     """
@@ -57,8 +57,8 @@ def test_parse_xml_no_products():
         parse_xml(xml_content)
 
 
-def test_parse_xml_missing_field():
-    xml_content = """
+def test_parse_xml_missing_field() -> None:
+    xml_content = b"""
     <sales_data date="2024-01-01">
         <products>
             <product>
@@ -75,8 +75,8 @@ def test_parse_xml_missing_field():
         parse_xml(xml_content)
 
 
-def test_parse_xml_invalid_data_type():
-    xml_content = """
+def test_parse_xml_invalid_data_type() -> None:
+    xml_content = b"""
     <sales_data date="2024-01-01">
         <products>
             <product>
@@ -94,8 +94,8 @@ def test_parse_xml_invalid_data_type():
         parse_xml(xml_content)
 
 
-def test_parse_xml_invalid_xml():
-    xml_content = "<sales_data><products><product></products>"
+def test_parse_xml_invalid_xml() -> None:
+    xml_content = b"<sales_data><products><product></products>"
 
     with pytest.raises(ET.ParseError):
         parse_xml(xml_content)

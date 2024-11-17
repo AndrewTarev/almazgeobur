@@ -3,7 +3,7 @@ import pytest
 from src.core.utils.data_analyzer import analyze_data
 
 
-def test_analyze_data_with_valid_sales_data():
+def test_analyze_data_with_valid_sales_data() -> None:
     sales_data = [
         {
             "date": "2023-10-01",
@@ -40,12 +40,12 @@ def test_analyze_data_with_valid_sales_data():
     assert result[3] == expected_categories_str
 
 
-def test_analyze_data_with_empty_sales_data():
+def test_analyze_data_with_empty_sales_data() -> None:
     with pytest.raises(ValueError, match="Data is empty."):
         analyze_data([])
 
 
-def test_analyze_data_with_single_sale():
+def test_analyze_data_with_single_sale() -> None:
     sales_data = [
         {
             "date": "2023-10-01",

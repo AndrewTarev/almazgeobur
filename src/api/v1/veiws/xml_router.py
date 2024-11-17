@@ -1,20 +1,20 @@
 from datetime import date
-from typing import List
+from typing import Any, List
 
-from celery.result import AsyncResult
-from fastapi import APIRouter, UploadFile, status, HTTPException, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, status
 from fastapi_cache.decorator import cache
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from celery.result import AsyncResult
 from src.api.v1.cruds.product_crud import OrmQuery
+from src.core import LLMreport, Product
 from src.core.db_helper import db_helper
 from src.core.schemas.schemas import (
     AIReportResponse,
-    ProductResponse,
     ParseEndpointResponse,
+    ProductResponse,
 )
 from src.core.utils.logging_config import my_logger
-
 
 router = APIRouter()
 
@@ -26,7 +26,7 @@ router = APIRouter()
 )
 async def parse_xml_endpoint(
     file: UploadFile,
-):
+) -> dict[str, str | Any]:
     """
     Принимает XML файл, создает цепочку фоновых задач в Celery.
     Цепочка задач состоит из таких функций:
@@ -61,7 +61,7 @@ async def parse_xml_endpoint(
 
 
 @router.get("/task-status/{task_id}")
-async def get_task_status(task_id: str):
+async def get_task_status(task_id: str) -> dict[str, Any]:
     """
     Показывает состояние задач по id.
 
@@ -97,7 +97,7 @@ async def get_task_status(task_id: str):
 async def get_ai_report(
     date_value: date = Query(..., description="Date example: '2024-01-01'"),
     session: AsyncSession = Depends(db_helper.session_getter),
-):
+) -> LLMreport:
     """
     Выдает сохраненный в БД llm отчет по дате.
 
@@ -107,7 +107,7 @@ async def get_ai_report(
 
     :return: Составленный AI отчет.
     """
-    return await OrmQuery.get_report_by_date(session=session, date=date_value)
+    return await OrmQuery.get_report_by_date(session=session, date_value=date_value)
 
 
 @router.get(
@@ -118,7 +118,7 @@ async def get_ai_report(
 async def get_sales_product(
     date_value: date = Query(..., description="Date example: '2024-01-01'"),
     session: AsyncSession = Depends(db_helper.session_getter),
-):
+) -> list[Product]:
     """
      Выдает сохраненные в БД данные из XML отчетов по дате.
 
@@ -128,4 +128,4 @@ async def get_sales_product(
 
     :return: Список из product.
     """
-    return await OrmQuery.get_product_by_date(session=session, date=date_value)
+    return await OrmQuery.get_product_by_date(session=session, date_value=date_value)

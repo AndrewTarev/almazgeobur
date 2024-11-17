@@ -1,10 +1,11 @@
 import sys
 
-from src.core.config import settings
 from loguru import logger
 
+from src.core.config import settings
 
-def configure_logging() -> logger:  #
+
+def configure_logging():  # type ignore
     # Удаление всех зависимостей по умолчанию
     logger.remove()
 
@@ -21,4 +22,4 @@ def configure_logging() -> logger:  #
     return logger
 
 
-my_logger: logger = configure_logging()
+my_logger = configure_logging()  # type ignore

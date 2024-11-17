@@ -1,4 +1,4 @@
-import datetime
+from datetime import date
 from typing import List
 
 from fastapi import HTTPException
@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.db_helper import db_helper
-from src.core.models.shop_model import Product, LLMreport
+from src.core.models.shop_model import LLMreport, Product
 from src.core.schemas.schemas import ProductBase
 from src.core.utils.logging_config import my_logger
 
@@ -56,35 +56,35 @@ class OrmQuery:
         return product_data
 
     @staticmethod
-    async def get_report_by_date(session: AsyncSession, date: datetime) -> LLMreport:
+    async def get_report_by_date(session: AsyncSession, date_value: date) -> LLMreport:
         """
         Выдает сохраненный в БД llm отчет по дате.
 
         :param session: Подключение к Postgres.
-        :param date: За какую дату хотите получить отчет.
+        :param date_value: За какую дату хотите получить отчет.
         :return: Составленный AI отчет.
         """
-        stmt = select(LLMreport).join(Product).where(Product.date == date)
+        stmt = select(LLMreport).join(Product).where(Product.date == date_value)
         results = await session.execute(stmt)
         report = results.scalars().first()
         if not report:
             raise HTTPException(
                 status_code=404, detail="No reports found for the given date"
             )
-        return report
+        return report  # type: ignore
 
     @staticmethod
     async def get_product_by_date(
-        session: AsyncSession, date: datetime
+        session: AsyncSession, date_value: date
     ) -> List[Product]:
         """
         Выдает сохраненные в БД данные из XML отчетов по дате.
 
         :param session: Подключение к Postgres
-        :param date: За какую дату хотите получить данные
+        :param date_value: За какую дату хотите получить данные
         :return: Список из product
         """
-        stmt = select(Product).where(Product.date == date)
+        stmt = select(Product).where(Product.date == date_value)
         results = await session.execute(stmt)
         products = results.scalars().all()
         if not products:

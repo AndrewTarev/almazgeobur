@@ -1,17 +1,17 @@
 import asyncio
+from typing import Any, Dict, List
 
 from celery import chain
-
 from src.api.v1.cruds.product_crud import OrmQuery
 from src.celery.celery_app import celery_app
 from src.core.utils.data_analyzer import analyze_data
 from src.core.utils.logging_config import my_logger
-from src.core.utils.xml_parser import parse_xml
 from src.core.utils.sales_data_prompt import generate_report_content
+from src.core.utils.xml_parser import parse_xml
 
 
 @celery_app.task
-def task_parse_xml(xml_text):
+def task_parse_xml(xml_text: bytes) -> List[Dict[str, Any]]:
     """
     Запускает функцию которая парсит XML контент.
     :param xml_text: XML content
@@ -21,7 +21,7 @@ def task_parse_xml(xml_text):
 
 
 @celery_app.task
-def task_analyze_data(prod_list):
+def task_analyze_data(prod_list: List[Dict[str, Any]]) -> tuple:
     """
     Принимает распаршенный контент и делает вычисления для составления prompt запрос к llm.
     :param prod_list: List[Dict[str, Any]] распаршенный контент
@@ -33,7 +33,7 @@ def task_analyze_data(prod_list):
 
 
 @celery_app.task
-def task_generate_report(analyze_report: tuple):
+def task_generate_report(analyze_report: tuple) -> tuple:
     """
     Генерирует prompt и отправляет запрос к LLM на генерацию отчета.
     """
@@ -51,7 +51,7 @@ def task_generate_report(analyze_report: tuple):
 
 
 @celery_app.task
-def task_save_result_to_db(data: tuple):
+def task_save_result_to_db(data: tuple) -> None:
     """Сохраняет данные в БД"""
     ai_report, data_dict = data
     asyncio.run(
@@ -63,7 +63,7 @@ def task_save_result_to_db(data: tuple):
 
 
 @celery_app.task
-def process_full_chain(content):
+def process_full_chain(content: bytes) -> dict:
     my_logger.debug("Starting process_full_chain")
     report_chain = chain(
         task_parse_xml.s(content),
@@ -71,5 +71,5 @@ def process_full_chain(content):
         task_generate_report.s(),
         task_save_result_to_db.s(),
     )
-    result = report_chain.apply_async()
+    report_chain.apply_async()
     return {"result": "Success"}
