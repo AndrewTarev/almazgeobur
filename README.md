@@ -46,4 +46,6 @@
 3. Запустите сборку контейнеров
     - docker-compose up --build
 
+API документация (Swagger/OpenAPI) доступна по пути http://0.0.0.0:8000/docs
 
+Мониторинг Celery http://0.0.0.0:5000
