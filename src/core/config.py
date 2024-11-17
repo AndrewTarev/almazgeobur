@@ -11,6 +11,10 @@ class OpenAPISettings(BaseSettings):
     openai_gpt_model: str
 
 
+class RedisCache(BaseSettings):
+    redis_cache: str
+
+
 class CeleryConfig(BaseSettings):
     CELERY_BROKER_URL: str
     CELERY_RESULT_BACKEND: str
@@ -65,6 +69,7 @@ class Settings(BaseModel):
     test_db: TestingConfig = TestingConfig()
     celery: CeleryConfig = CeleryConfig()
     openapi: OpenAPISettings = OpenAPISettings()
+    cache_url: RedisCache = RedisCache()
     logging: str = "DEBUG"
 
 

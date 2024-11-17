@@ -1,7 +1,6 @@
 from datetime import datetime
-from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict
 
 
 class ProductBase(BaseModel):
@@ -13,17 +12,15 @@ class ProductBase(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
 
-class ProductOut(ProductBase):
+class AIReportResponse(BaseModel):
     id: int
-    model_config = ConfigDict(from_attributes=True)
+    ai_report: str
 
 
-class TaskID(BaseModel):
-    ai_report: str = Field(
-        title="Task id from Celery. You can get it for path '/parse-xml/'",
-        max_length=50,
-    )
-    dict_data: list[dict[str, Any]] = Field(
-        title="Task id from Celery. You can get it for path '/parse-xml/'",
-        max_length=50,
-    )
+class ProductResponse(ProductBase):
+    id: int
+
+
+class ParseEndpointResponse(BaseModel):
+    result: str
+    task_id: str

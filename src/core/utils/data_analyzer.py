@@ -1,21 +1,26 @@
 from typing import Any
-from fastapi import HTTPException
 from src.core.utils.logging_config import my_logger
 
 
 def analyze_data(sales_data: list[dict[str, Any]]) -> tuple:
     """
-    Analyzes sales data and returns a summary including total revenue,
-    top products, and categories.
+    Анализирует данные о продажах и возвращает сводку, включающую общую выручку,
+    топовые продукты и категории.
 
-    :param sales_data: A list of dictionaries, each representing a sale.
-    :return: A tuple containing the date, total revenue, top products, and categories.
+    :param sales_data: Список словарей, каждый из которых представляет продажу.
+                       Каждый словарь должен содержать ключи:
+                       "name", "quantity", "price", "category", и "date".
+    :return: Кортеж, содержащий:
+         - дату первой записи из данных
+         - общую выручку
+         - строку с топ-3 продуктами и их количеством
+         - строку с распределением по категориям и количеством продаж.
     """
     my_logger.debug("Task analyzing data started")
 
     if not sales_data:
         my_logger.info("Data is empty.")
-        raise HTTPException(status_code=404, detail="Data is empty.")
+        raise ValueError("Data is empty.")
 
     date = sales_data[0]["date"]
     total_revenue = 0

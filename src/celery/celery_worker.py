@@ -2,7 +2,7 @@ import asyncio
 
 from celery import chain
 
-from src.api.v1.cruds.product_crud import create_new_products_and_report
+from src.api.v1.cruds.product_crud import OrmQuery
 from src.celery.celery_app import celery_app
 from src.core.utils.data_analyzer import analyze_data
 from src.core.utils.logging_config import my_logger
@@ -35,7 +35,7 @@ def task_analyze_data(prod_list):
 @celery_app.task
 def task_generate_report(analyze_report: tuple):
     """
-    Генерирует prompt запрос к LLM на генерацию отчета.
+    Генерирует prompt и отправляет запрос к LLM на генерацию отчета.
     """
     dict_data_result = analyze_report[1]  # Распаршенный XML контент
     analyze_report = analyze_report[0]
@@ -55,7 +55,7 @@ def task_save_result_to_db(data: tuple):
     """Сохраняет данные в БД"""
     ai_report, data_dict = data
     asyncio.run(
-        create_new_products_and_report(
+        OrmQuery.create_new_products_and_report(
             ai_report=ai_report,
             data=data_dict,
         )
@@ -71,4 +71,5 @@ def process_full_chain(content):
         task_generate_report.s(),
         task_save_result_to_db.s(),
     )
-    report_chain.apply_async()
+    result = report_chain.apply_async()
+    return {"result": "Success"}
