@@ -40,7 +40,7 @@
     - git clone https://github.com/AndrewTarev/almazgeobur.git
    
 
-2. Добавьте .env файл и установите переменные из .env.template
+2. Установите свои переменные в .env файл
 
 
 3. Запустите сборку контейнеров
